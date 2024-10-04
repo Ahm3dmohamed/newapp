@@ -10,29 +10,43 @@ class EndPoints {
 
 class ApiManager {
   static const String baseUrl = "newsapi.org";
-  static const String apiKey = "e34182266905435bb3039fa6de9eb4db";
+  static const String apiKey = "f766fc89b5694cc68b5b5c79c7744b50";
 
-  static Future<SoursesResponceModel?> getSources() async {
-    var params = {
-      "apiKey": apiKey,
-    };
-    Uri url = Uri.https(baseUrl, EndPoints.sources, params);
+  static Future<SoursesResponceModel?> getSources(
+    String sourceName,
+  ) async {
+    try {
+      var params = {
+        "apiKey": apiKey,
+        'category': sourceName,
+      };
+      Uri url = Uri.https(baseUrl, EndPoints.sources, params);
 
-    http.Response response = await http.get(url);
-    if (response.statusCode == 200) {
-      var json = jsonDecode(response.body);
-      SoursesResponceModel sourcesResponse =
-          SoursesResponceModel.fromJson(json);
-      return sourcesResponse;
-    } else {
-      throw Exception("Failed to load sources");
+      http.Response response = await http.get(url);
+      if (response.statusCode == 429) {
+        print('Too many requests - please try again later');
+      }
+      if (response.statusCode == 200) {
+        var json = jsonDecode(response.body);
+        SoursesResponceModel sourcesResponse =
+            SoursesResponceModel.fromJson(json);
+        return sourcesResponse;
+      } else {
+        print('Failed to load sources: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Error: $e');
+      return null;
     }
   }
 
-  static Future<ArticleModel?> getArticles() async {
+  static Future<ArticleModel?> getArticles(
+    String id,
+  ) async {
     var params = {
       "apiKey": apiKey,
-      "q": "messi",
+      "q": id,
       "pageSize": "20",
     };
     Uri url = Uri.https(baseUrl, EndPoints.articleUrl, params);

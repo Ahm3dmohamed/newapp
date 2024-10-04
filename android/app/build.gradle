@@ -7,8 +7,8 @@ plugins {
 
 android {
     namespace = "com.example.news_app"
-    compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    compileSdk = 34 // Specify the version of Android SDK you want to compile against
+    ndkVersion = "21.4.7075529" // Replace with a specific NDK version or remove if not using NDK
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -16,29 +16,29 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8
+        jvmTarget = "1.8"
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
+        // Specify your unique Application ID
         applicationId = "com.example.news_app"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
+        
+        // Set minSdkVersion and targetSdkVersion
+        minSdkVersion = 19 // Minimum SDK version your app supports
+        targetSdkVersion = 33 // Target SDK version
+
+        versionCode = 1 // Your app's version code
+        versionName = "1.0" // Your app's version name
     }
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
+            // Use the debug signing config for now (change this for release builds)
             signingConfig = signingConfigs.debug
         }
     }
 }
 
 flutter {
-    source = "../.."
+    source = "../.." // This points to the Flutter source files
 }

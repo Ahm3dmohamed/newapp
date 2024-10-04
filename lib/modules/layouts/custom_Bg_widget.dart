@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-class CustomSplash extends StatelessWidget {
+class CustomBgWidget extends StatelessWidget {
   Widget child;
   // static const String routeName = "CustomSplash";
-  CustomSplash({required this.child});
+  CustomBgWidget({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

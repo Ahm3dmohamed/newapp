@@ -10,8 +10,8 @@ class Apptheme {
             color: Colors.black,
           ),
           bodyMedium: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
             color: Colors.black,
           )),
       drawerTheme: const DrawerThemeData(

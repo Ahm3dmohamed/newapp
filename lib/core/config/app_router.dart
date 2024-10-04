@@ -1,37 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:news_app/core/config/page_routes_name.dart';
-import 'package:news_app/modules/layouts/splash/splash_screen.dart';
-import 'package:news_app/modules/screens/article_data_screen.dart';
 import 'package:news_app/modules/screens/home.dart';
-import 'package:news_app/modules/screens/source_data_screen.dart';
+import 'package:news_app/modules/screens/news_screen.dart';
 import 'package:news_app/modules/screens/settings.dart';
+import 'package:news_app/modules/widgets/category_data.dart';
 
 class AppRouter {
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
+    final args = settings.arguments;
+
     switch (settings.name) {
-      // case PageRoutesName.splashName:
-      //   return MaterialPageRoute(
-      //       builder: (context) => SplashScreen(), settings: settings);
       case PageRoutesName.homeScreen:
         return MaterialPageRoute(
-            builder: (context) => HomeScreen(), settings: settings);
+          builder: (context) => const HomeScreen(),
+          settings: settings,
+        );
+
       case PageRoutesName.newsScreen:
-        return MaterialPageRoute(
-            builder: (context) => const NewsScreen(), settings: settings);
+        if (args is CategoryData) {
+          return MaterialPageRoute(
+            builder: (context) => NewsScreen(),
+            settings: settings,
+          );
+        }
+        return _errorRoute();
+
       case PageRoutesName.setting:
         return MaterialPageRoute(
-            builder: (context) => Settings(), settings: settings);
-
-      case PageRoutesName.articleScreen:
-        return MaterialPageRoute(
-          builder: (context) => const ArticleDataScreen(),
+          builder: (context) => const Settings(),
+          settings: settings,
         );
 
       default:
-        return MaterialPageRoute(
-            builder: (context) =>
-                const Center(child: Text("Ther Is No Routes Yaa Broo")),
-            settings: settings);
+        return _errorRoute();
     }
+  }
+
+  static Route<dynamic> _errorRoute() {
+    return MaterialPageRoute(
+      builder: (context) => const Scaffold(
+        body: Center(
+          child: Text("There is no route for this screen!"),
+        ),
+      ),
+    );
   }
 }
