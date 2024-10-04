@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:news_app/modules/screens/source_data_screen.dart';
-import 'package:news_app/modules/screens/widgets/category_data.dart';
+import 'package:news_app/modules/widgets/category_data.dart';
 
 class CategoryItemsWidget extends StatelessWidget {
   final CategoryData categoryData;
+  void Function(CategoryData) onTap;
   int index;
-  CategoryItemsWidget(this.categoryData, this.index);
+  CategoryItemsWidget({
+    required this.onTap,
+    required this.categoryData,
+    required this.index,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -14,11 +18,7 @@ class CategoryItemsWidget extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       child: InkWell(
         onTap: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => NewsScreen(),
-              ));
+          onTap(categoryData);
         },
         child: Container(
             height: size.height * 0.3,
@@ -47,7 +47,7 @@ class CategoryItemsWidget extends StatelessWidget {
                   ),
                   child: Text(
                     categoryData.name,
-                    style: const TextStyle(color: Colors.white),
+                    style: const TextStyle(fontSize: 19, color: Colors.white),
                   ),
                 ),
               ],

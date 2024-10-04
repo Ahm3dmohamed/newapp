@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:news_app/manager/api_manager.dart';
 import 'package:news_app/models/article_responce_model.dart';
 import 'package:news_app/models/sourses_responce_model.dart';
 
 class MainProvider extends ChangeNotifier {
-  int currentIndex = 0;
-  SoursesResponceModel? sourcesResponseModel;
-  ArticleModel? articleResponseModel;
+  // int currentIndex = 0;
+  // SoursesResponceModel? sourcesResponseModel;
+  // ArticleModel? articleResponseModel;
 
-  bool isLoading = false;
-  String? errorMessage;
+  // bool isLoading = false;
+  // String? errorMessage;
 
-  void setIndex(int index) {
-    currentIndex = index;
-    notifyListeners();
-  }
+  // void setIndex(int index) {
+  //   currentIndex = index;
+  //   notifyListeners();
+  // }
 
   // Future<void> fetchSources() async {
   //   isLoading = true;
