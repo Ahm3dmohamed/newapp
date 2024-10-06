@@ -47,7 +47,25 @@ class ApiManager {
     var params = {
       "apiKey": apiKey,
       "q": id,
-      "pageSize": "20",
+    };
+    Uri url = Uri.https(baseUrl, EndPoints.articleUrl, params);
+
+    http.Response response = await http.get(url);
+    if (response.statusCode == 200) {
+      var json = jsonDecode(response.body);
+      ArticleModel articleResponse = ArticleModel.fromJson(json);
+      return articleResponse;
+    } else {
+      throw Exception("Failed to load articles");
+    }
+  }
+
+  static Future<ArticleModel?> searchArticlesData(
+    String query,
+  ) async {
+    var params = {
+      "apiKey": apiKey,
+      "q": query,
     };
     Uri url = Uri.https(baseUrl, EndPoints.articleUrl, params);
 

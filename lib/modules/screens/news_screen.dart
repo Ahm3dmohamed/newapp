@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // Import localization
 import 'package:news_app/manager/api_manager.dart';
 import 'package:news_app/models/article_responce_model.dart';
 import 'package:news_app/models/sourses_responce_model.dart';
@@ -10,7 +11,7 @@ import 'package:news_app/modules/widgets/tab_item.dart';
 import 'package:shimmer/shimmer.dart';
 
 class NewsScreen extends StatefulWidget {
-  static const String routeName = "NewScreen";
+  static const String routeName = "NewsScreen";
 
   CategoryData? categoryData;
 
@@ -21,33 +22,31 @@ class NewsScreen extends StatefulWidget {
 }
 
 class _NewsScreenState extends State<NewsScreen> {
-  // CategoryItemsWidget? categoryData;
-  int slectedIndex = 0;
+  int selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
-    // print('====== ${widget.categoryData!.categoryId}');
-
     Size size = MediaQuery.of(context).size;
 
     return CustomBgWidget(
       child: Scaffold(
         backgroundColor: Colors.transparent,
-
-        // ),
         body: FutureBuilder<SoursesResponceModel?>(
-          future: ApiManager.getSources(
-            widget.categoryData!.categoryId,
-          ),
+          future: ApiManager.getSources(widget.categoryData!.categoryId),
           builder: (BuildContext context,
               AsyncSnapshot<SoursesResponceModel?> snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              // Show Shimmer while sources are loading
               return _buildShimmerSkeleton(size);
             } else if (snapshot.hasError) {
-              return const Center(child: Text("Error in Data"));
+              return Center(
+                child: Text(AppLocalizations.of(context)!
+                    .error_Data), // Localized error message
+              );
             } else if (!snapshot.hasData || snapshot.data?.sources == null) {
-              return const Center(child: Text("No data available"));
+              return Center(
+                child: Text(AppLocalizations.of(context)!
+                    .no_Data), // Localized no data message
+              );
             } else {
               List<Sources> sources = snapshot.data!.sources!;
 
@@ -62,15 +61,14 @@ class _NewsScreenState extends State<NewsScreen> {
                         indicatorColor: Colors.transparent,
                         isScrollable: true,
                         onTap: (value) {
-                          slectedIndex = value;
-
+                          selectedIndex = value;
                           setState(() {});
                         },
                         tabs: sources
                             .map((source) => TabItem(
                                   source: source,
                                   isSelected:
-                                      slectedIndex == sources.indexOf(source),
+                                      selectedIndex == sources.indexOf(source),
                                 ))
                             .toList(),
                       ),
@@ -78,19 +76,23 @@ class _NewsScreenState extends State<NewsScreen> {
                     Expanded(
                       child: FutureBuilder<ArticleModel?>(
                         future: ApiManager.getArticles(
-                          sources[slectedIndex].id ?? '',
-                        ),
+                            sources[selectedIndex].id ?? ''),
                         builder: (BuildContext context,
                             AsyncSnapshot<ArticleModel?> snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
                             return _buildShimmerSkeleton(size);
                           } else if (snapshot.hasError) {
-                            return const Center(child: Text("Error in Data"));
+                            return Center(
+                              child: Text(AppLocalizations.of(context)!
+                                  .error_Data), // Localized error message
+                            );
                           } else if (!snapshot.hasData ||
                               snapshot.data?.articles == null) {
-                            return const Center(
-                                child: Text("No articles available"));
+                            return Center(
+                              child: Text(AppLocalizations.of(context)!
+                                  .no_Articles), // Localized no articles message
+                            );
                           } else {
                             List<Articles> articles = snapshot.data!.articles!;
 
@@ -119,7 +121,6 @@ class _NewsScreenState extends State<NewsScreen> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          // Article Image
                                           if (article.urlToImage != null)
                                             ClipRRect(
                                               borderRadius:
@@ -148,21 +149,25 @@ class _NewsScreenState extends State<NewsScreen> {
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  article.title ?? "No Title",
+                                                  article.title ??
+                                                      AppLocalizations.of(
+                                                              context)!
+                                                          .no_Title, // Localized title
                                                   style: const TextStyle(
                                                     fontSize: 18,
                                                     fontWeight: FontWeight.bold,
                                                   ),
                                                 ),
+                                                // const SizedBox(height: 8),
+                                                // Text(
+                                                //   article.description ??
+                                                //       AppLocalizations.of(
+                                                //               context)!
+                                                //           .no_Description, // Localized description
+                                                //   style: const TextStyle(
+                                                //       fontSize: 14),
+                                                // ),
                                                 const SizedBox(height: 8),
-                                                Text(
-                                                  article.description ??
-                                                      "No Description available",
-                                                  style: const TextStyle(
-                                                      fontSize: 14),
-                                                ),
-                                                const SizedBox(height: 8),
-                                                // Published Time
                                                 Row(
                                                   mainAxisAlignment:
                                                       MainAxisAlignment
@@ -172,7 +177,9 @@ class _NewsScreenState extends State<NewsScreen> {
                                                       article.publishedAt
                                                               ?.substring(
                                                                   0, 10) ??
-                                                          "Unknown Date",
+                                                          AppLocalizations.of(
+                                                                  context)!
+                                                              .un_knownDate, // Localized date
                                                       style: const TextStyle(
                                                           fontSize: 12,
                                                           color: Colors.grey),
@@ -222,7 +229,6 @@ class _NewsScreenState extends State<NewsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Simulated Image
                   Container(
                     height: size.height * 0.25,
                     width: size.width,
@@ -233,21 +239,18 @@ class _NewsScreenState extends State<NewsScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Simulated Title
                         Container(
                           width: size.width * 0.7,
                           height: 20,
                           color: Colors.grey[300],
                         ),
                         const SizedBox(height: 8),
-                        // Simulated Description
                         Container(
                           width: size.width * 0.9,
                           height: 14,
                           color: Colors.grey[300],
                         ),
                         const SizedBox(height: 8),
-                        // Simulated Date
                         Container(
                           width: size.width * 0.3,
                           height: 12,

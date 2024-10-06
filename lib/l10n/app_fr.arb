@@ -1,0 +1,42 @@
+{
+    "title": "Application de Nouvelles",
+    "settings": "Paramètres",
+    "language": "Langue",
+    "choose_language": "Choisissez une langue",
+    "news": "Nouvelles",
+    "favorites": "Favoris",
+    "search": "Rechercher",
+    "category": "Catégorie",
+    "error_Data": "Erreur dans les données",
+    "no_Data": "Données non disponibles",
+    "no_Articles": "Aucun article disponible",
+    "no_Title": "Pas de titre",
+    "no_Description": "Description non disponible",
+    "view_Full_Article":"parle soul Article",
+    "unknown_Date": "Date inconnue",  
+    "@title": {
+      "description": "Le titre de l'application"
+    },
+    "@settings": {
+      "description": "Titre de la section des paramètres"
+    },
+    "@language": {
+      "description": "Étiquette pour la sélection de la langue"
+    },
+    "@choose_language": {
+      "description": "Invite pour choisir une langue"
+    },
+    "@news": {
+      "description": "Étiquette pour la section des nouvelles"
+    },
+    "@favorites": {
+      "description": "Étiquette pour la section des favoris"
+    },
+    "@search": {
+      "description": "Étiquette pour la fonction de recherche"
+    },
+    "@category": {
+      "description": "Étiquette pour la section de catégorie"
+    }
+  }
+  

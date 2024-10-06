@@ -1,0 +1,42 @@
+{
+    "title": "تطبيق الأخبار",
+    "settings": "الإعدادات",
+    "language": "اللغة",
+    "choose_language": "اختر اللغة",
+    "news": "الأخبار",
+    "favorites": "المفضلة",
+    "search": "بحث",
+    "category": "الفئة",
+    "error_Data": "خطأ في البيانات",
+    "no_Data": "لا توجد بيانات متاحة",
+    "no_Articles": "لا توجد مقالات متاحة",
+    "no_Title": "لا يوجد عنوان",
+    "no_Description": "لا توجد وصف متاح",
+    "unknown_Date": "تاريخ غير معروف",
+    "view_Full_Article":"إطلع علي المقال كامل",
+    "@title": {
+      "description": "عنوان التطبيق"
+    },
+    "@settings": {
+      "description": "عنوان قسم الإعدادات"
+    },
+    "@language": {
+      "description": "تسمية لاختيار اللغة"
+    },
+    "@choose_language": {
+      "description": "موجه لاختيار اللغة"
+    },
+    "@news": {
+      "description": "تسمية لقسم الأخبار"
+    },
+    "@favorites": {
+      "description": "تسمية لقسم المفضلة"
+    },
+    "@search": {
+      "description": "تسمية لوظيفة البحث"
+    },
+    "@category": {
+      "description": "تسمية لقسم الفئة"
+    }
+  }
+  

@@ -1,0 +1,42 @@
+{
+  "title": "Aplicación de Noticias",
+  "settings": "Configuraciones",
+  "language": "Idioma",
+  "choose_language": "Elige un idioma",
+  "news": "Noticias",
+  "favorites": "Favoritos",
+  "search": "Buscar",
+  "category": "Categoría",
+  "error_Data": "Error en los datos",
+  "no_Data": "Datos no disponibles",
+  "no_Articles": "No hay artículos disponibles",
+  "no_Title": "Sin título",
+  "no_Description": "Descripción no disponible",
+  "unknown_Date": "Fecha desconocida",
+  "view_Full_Article":"Viewio Foull Articloia",
+
+  "@title": {
+    "description": "El título de la aplicación"
+  },
+  "@settings": {
+    "description": "Título de la sección de configuraciones"
+  },
+  "@language": {
+    "description": "Etiqueta para la selección de idioma"
+  },
+  "@choose_language": {
+    "description": "Pregunta para elegir un idioma"
+  },
+  "@news": {
+    "description": "Etiqueta para la sección de noticias"
+  },
+  "@favorites": {
+    "description": "Etiqueta para la sección de favoritos"
+  },
+  "@search": {
+    "description": "Etiqueta para la función de búsqueda"
+  },
+  "@category": {
+    "description": "Etiqueta para la sección de categoría"
+  }
+}

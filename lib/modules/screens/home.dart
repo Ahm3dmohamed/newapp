@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // Import localization
 import 'package:news_app/models/article_responce_model.dart';
 import 'package:news_app/models/category_screen.dart';
-import 'package:news_app/modules/screens/details_screen.dart';
 import 'package:news_app/modules/screens/news_screen.dart';
 import 'package:news_app/modules/screens/settings.dart';
 import 'package:news_app/modules/screens/search/article_card_widget.dart';
@@ -28,30 +28,31 @@ class _HomeScreenState extends State<HomeScreen> {
         imagePath: "assets/images/ball.png"),
     CategoryData(
         backgrounColor: Colors.cyan,
-        name: "Bussines",
+        name: "Business",
         categoryId: "business",
-        imagePath: "assets/images/bussines.png"),
+        imagePath: "assets/images/bussines.png"), // Corrected spelling
     CategoryData(
         backgrounColor: Colors.green,
-        name: "science",
+        name: "Science",
         categoryId: "science",
         imagePath: "assets/images/science.png"),
     CategoryData(
         backgrounColor: Colors.blue,
-        name: "politics",
+        name: "Politics",
         categoryId: "general",
-        imagePath: "assets/images/Politics.png"),
+        imagePath: "assets/images/politics.png"), // Corrected to lowercase
     CategoryData(
         backgrounColor: Colors.purple,
-        name: "health",
+        name: "Health",
         categoryId: "health",
         imagePath: "assets/images/health.png"),
     CategoryData(
         backgrounColor: Colors.orange,
-        name: "environment",
-        categoryId: "entertainment",
-        imagePath: "assets/images/environment.png")
+        name: "Entertainment",
+        categoryId: "technology",
+        imagePath: "assets/images/environment.png"),
   ];
+
   List<Articles>? searchResults;
   bool isSearching = false;
   String searchQuery = '';
@@ -65,11 +66,12 @@ class _HomeScreenState extends State<HomeScreen> {
     return CustomBgWidget(
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        drawer: buildDrawer(size),
+        drawer: buildDrawer(size, context),
         appBar: AppBar(
           title: isSearching
               ? buildSearchField()
-              : Text(categoryData?.name ?? "News App"),
+              : Text(categoryData?.name ??
+                  AppLocalizations.of(context)!.title), // Localized title
           actions: buildAppBarActions(),
         ),
         body: isSearching
@@ -88,37 +90,31 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // Drawer method
-  Drawer buildDrawer(Size size) {
+  Drawer buildDrawer(Size size, BuildContext context) {
     return Drawer(
       child: Scaffold(
         appBar: AppBar(
           toolbarHeight: size.height * .18,
-          title: const Text(
-            "News App",
-            // style: TextStyle(
-            //   fontSize: 22,
-            //   fontWeight: FontWeight.bold,
-            //   color: Colors.white,
-            // ),
-          ),
+          title: Text(AppLocalizations.of(context)!.title), // Localized title
         ),
         body: Column(
           children: [
             CustomListTile(
               onTap: popDrawer,
               icon: Icons.list_rounded,
-              txt: "Categories",
+              txt: AppLocalizations.of(context)!
+                  .category, // Localized categories
             ),
             CustomListTile(
               icon: Icons.settings,
-              txt: "Settings",
+              txt: (AppLocalizations.of(context)!.settings),
+              // Localized settings
               onTap: () {
-                Navigator.pushAndRemoveUntil(
+                Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => const Settings(),
                   ),
-                  (route) => false,
                 );
               },
             ),
@@ -132,10 +128,10 @@ class _HomeScreenState extends State<HomeScreen> {
   TextField buildSearchField() {
     return TextField(
       controller: searchController,
-      decoration: const InputDecoration(
-        hintText: 'Search articles...',
+      decoration: InputDecoration(
+        hintText: AppLocalizations.of(context)!.search, // Localized search hint
         border: InputBorder.none,
-        hintStyle: TextStyle(color: Colors.white60),
+        hintStyle: const TextStyle(color: Colors.white60),
       ),
       style: const TextStyle(color: Colors.white),
       onSubmitted: searchArticles, // Trigger search on submission
@@ -172,11 +168,17 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // Method for displaying search results
   Widget buildSearchResults() {
     if (searchResults == null) {
+      return Center(
+        child: Text(
+            AppLocalizations.of(context)!.search), // Localized search prompt
+      );
+    }
+
+    if (searchResults!.isEmpty) {
       return const Center(
-        child: Text("Search for articles..."),
+        child: Text("No Article Found"),
       );
     }
 
@@ -184,23 +186,8 @@ class _HomeScreenState extends State<HomeScreen> {
       itemCount: searchResults?.length ?? 0,
       itemBuilder: (context, index) {
         Articles article = searchResults![index];
-        return buildArticleWidget(article);
+        return ArticleCardWidget(article: article);
       },
-    );
-  }
-
-  // Article Widget method
-  Widget buildArticleWidget(Articles article) {
-    return InkWell(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => DetailsScreen(article: article),
-          ),
-        );
-      },
-      child: ArticleCardWidget(),
     );
   }
 
@@ -208,7 +195,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void onCategoryTap(CategoryData selectedCategoryData) {
     setState(() {
       categoryData = selectedCategoryData;
-      searchResults = null; // Reset search results when category changes
+      searchResults = null;
     });
   }
 
@@ -220,7 +207,6 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  // Search Articles method
   void searchArticles(String query) async {
     if (query.isNotEmpty) {
       setState(() {
@@ -231,8 +217,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
       setState(() {
         isSearching = false;
-        searchResults = articleModelResponse?.articles;
+        searchResults =
+            filterValidArticles(articleModelResponse?.articles ?? []);
       });
     }
+  }
+
+  List<Articles> filterValidArticles(List<Articles> articles) {
+    return articles.where((article) {
+      return article.title != null &&
+          article.description != null &&
+          article.publishedAt != null;
+    }).toList();
   }
 }

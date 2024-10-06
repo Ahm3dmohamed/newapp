@@ -29,4 +29,32 @@ class Apptheme {
                 bottomRight: Radius.circular(44))),
         backgroundColor: Appcolor.appbarColor,
       ));
+
+  static ThemeData darkTheme = ThemeData(
+      textTheme: const TextTheme(
+          bodySmall: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: Colors.black,
+          ),
+          bodyMedium: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+            color: Colors.black,
+          )),
+      drawerTheme: const DrawerThemeData(
+        backgroundColor: Color.fromARGB(255, 2, 59, 4),
+      ),
+      appBarTheme: AppBarTheme(
+        toolbarHeight: 88,
+        titleTextStyle: const TextStyle(fontSize: 22, color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white, size: 34),
+        centerTitle: true,
+        foregroundColor: Appcolor.defualtColor,
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(44),
+                bottomRight: Radius.circular(44))),
+        backgroundColor: const Color.fromARGB(255, 1, 78, 1),
+      ));
 }

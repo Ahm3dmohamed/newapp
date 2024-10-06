@@ -1,20 +1,27 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:news_app/models/article_responce_model.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class DetailsScreen extends StatelessWidget {
+  static const String routeName = "DetailsScreen";
   final Articles article;
 
-  const DetailsScreen({Key? key, required this.article}) : super(key: key);
+  const DetailsScreen({super.key, required this.article});
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+    var localizations = AppLocalizations.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(article.title ?? "Article Details"),
+        title: Text(
+          article.title ?? localizations?.no_Title ?? "Article Details",
+          style: const TextStyle(fontSize: 16),
+          maxLines: 2,
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -34,12 +41,14 @@ class DetailsScreen extends StatelessWidget {
                   imageUrl: article.urlToImage!,
                   placeholder: (context, url) =>
                       const Center(child: CircularProgressIndicator()),
-                  errorWidget: (context, url, error) => const Icon(Icons.error),
+                  errorWidget: (context, url, error) => Image.asset(
+                    "assets/images/me.jpg",
+                  ),
                 ),
               ),
             SizedBox(height: size.height * .02),
             Text(
-              article.title ?? "No Title",
+              article.title ?? localizations?.no_Title ?? "No Title",
               style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
@@ -50,7 +59,9 @@ class DetailsScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Text(
-                  article.publishedAt?.substring(0, 10) ?? "Unknown Date",
+                  article.publishedAt?.substring(0, 10) ??
+                      localizations?.un_knownDate ??
+                      "Unknown Date",
                   style: const TextStyle(
                     fontSize: 14,
                     color: Colors.grey,
@@ -60,7 +71,9 @@ class DetailsScreen extends StatelessWidget {
             ),
             SizedBox(height: size.height * .02),
             Text(
-              article.content ?? "No Content Available",
+              article.content ??
+                  localizations?.no_Description ??
+                  "No Content Available",
               style: const TextStyle(fontSize: 18),
             ),
             SizedBox(height: size.height * .05),
@@ -71,7 +84,8 @@ class DetailsScreen extends StatelessWidget {
                   onPressed: () {
                     _launchUrl(article.url ?? "");
                   },
-                  child: const Text("View Full Article"),
+                  child: Text(
+                      localizations?.view_Full_Article ?? "View Full Article"),
                 ),
                 const Icon(Icons.navigate_next),
               ],
