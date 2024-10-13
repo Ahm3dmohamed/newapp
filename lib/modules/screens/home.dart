@@ -1,233 +1,222 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // Import localization
+import 'package:news_app/core/drawer/custom_drawer.dart';
 import 'package:news_app/models/article_responce_model.dart';
 import 'package:news_app/models/category_screen.dart';
-import 'package:news_app/modules/screens/news_screen.dart';
-import 'package:news_app/modules/screens/settings.dart';
-import 'package:news_app/modules/screens/search/article_card_widget.dart';
-import 'package:news_app/modules/widgets/category_data.dart';
+import 'package:news_app/modules/home/manager/home_connector.dart';
+import 'package:news_app/modules/home/manager/home_view_model.dart';
 import 'package:news_app/modules/layouts/custom_Bg_widget.dart';
-import 'package:news_app/manager/api_manager.dart';
-import 'package:news_app/core/drawer/custom_list_tiledart';
+import 'package:news_app/modules/screens/details_screen.dart';
+import 'package:news_app/modules/screens/news_screen.dart';
+import 'package:news_app/modules/screens/search/article_card_widget.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class HomeScreen extends StatefulWidget {
   static const String routeName = "HomeScreen";
+
   const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  CategoryData? categoryData;
-  List<CategoryData> categoryDataList = [
-    CategoryData(
-        backgrounColor: Colors.red,
-        name: "Sports",
-        categoryId: "sports",
-        imagePath: "assets/images/ball.png"),
-    CategoryData(
-        backgrounColor: Colors.cyan,
-        name: "Business",
-        categoryId: "business",
-        imagePath: "assets/images/bussines.png"), // Corrected spelling
-    CategoryData(
-        backgrounColor: Colors.green,
-        name: "Science",
-        categoryId: "science",
-        imagePath: "assets/images/science.png"),
-    CategoryData(
-        backgrounColor: Colors.blue,
-        name: "Politics",
-        categoryId: "general",
-        imagePath: "assets/images/politics.png"), // Corrected to lowercase
-    CategoryData(
-        backgrounColor: Colors.purple,
-        name: "Health",
-        categoryId: "health",
-        imagePath: "assets/images/health.png"),
-    CategoryData(
-        backgrounColor: Colors.orange,
-        name: "Entertainment",
-        categoryId: "technology",
-        imagePath: "assets/images/environment.png"),
-  ];
-
-  List<Articles>? searchResults;
-  bool isSearching = false;
-  String searchQuery = '';
-
-  TextEditingController searchController = TextEditingController();
+class _HomeScreenState extends State<HomeScreen> implements HomeConnector {
+  final TextEditingController searchController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
 
     return CustomBgWidget(
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        drawer: buildDrawer(size, context),
-        appBar: AppBar(
-          title: isSearching
-              ? buildSearchField()
-              : Text(categoryData?.name ??
-                  AppLocalizations.of(context)!.title), // Localized title
-          actions: buildAppBarActions(),
-        ),
-        body: isSearching
-            ? buildSearchResults()
-            : categoryData == null
-                ? CategoryScreen(
-                    size: size,
-                    onCategoryClick: onCategoryTap,
-                    categoryDataList: categoryDataList,
-                  )
-                : NewsScreen(
-                    categoryData: categoryData,
-                  ),
-      ),
-    );
-  }
-
-  // Drawer method
-  Drawer buildDrawer(Size size, BuildContext context) {
-    return Drawer(
-      child: Scaffold(
-        appBar: AppBar(
-          toolbarHeight: size.height * .18,
-          title: Text(AppLocalizations.of(context)!.title), // Localized title
-        ),
-        body: Column(
-          children: [
-            CustomListTile(
-              onTap: popDrawer,
-              icon: Icons.list_rounded,
-              txt: AppLocalizations.of(context)!
-                  .category, // Localized categories
-            ),
-            CustomListTile(
-              icon: Icons.settings,
-              txt: (AppLocalizations.of(context)!.settings),
-              // Localized settings
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const Settings(),
-                  ),
-                );
-              },
-            ),
-          ],
+      child: ChangeNotifierProvider(
+        create: (_) => HomeViewModel()..connector = this,
+        child: Consumer<HomeViewModel>(
+          builder: (context, viewModel, child) {
+            return Scaffold(
+              backgroundColor: Colors.transparent,
+              drawer: CustomDrawer(viewModel: viewModel),
+              appBar: AppBar(
+                title: viewModel.isSearching
+                    ? buildSearchField(viewModel)
+                    : Text(viewModel.categoryData?.name ??
+                        AppLocalizations.of(context)!.title),
+                actions: buildAppBarActions(viewModel),
+              ),
+              body: viewModel.isSearching
+                  ? buildArticleWidget(
+                      viewModel.searchResults) // Show search results
+                  : _buildMainContent(
+                      viewModel, size), // Show category articles
+            );
+          },
         ),
       ),
     );
   }
 
-  // Search Bar method
-  TextField buildSearchField() {
+  Widget _buildMainContent(HomeViewModel viewModel, Size size) {
+    return viewModel.categoryData == null
+        ? CategoryScreen(
+            size: size,
+            onCategoryClick: viewModel.onCategoryTap,
+            categoryDataList: viewModel.categoryDataList,
+          )
+        : buildArticleWidget(viewModel
+            .filteredArticles); // Show filtered articles for the selected category
+  }
+
+  TextField buildSearchField(HomeViewModel viewModel) {
     return TextField(
-      controller: searchController,
-      decoration: InputDecoration(
-        hintText: AppLocalizations.of(context)!.search, // Localized search hint
-        border: InputBorder.none,
-        hintStyle: const TextStyle(color: Colors.white60),
-      ),
-      style: const TextStyle(color: Colors.white),
-      onSubmitted: searchArticles, // Trigger search on submission
-    );
+        controller: searchController,
+        autofocus: true,
+        decoration: InputDecoration(
+          hintText: AppLocalizations.of(context)!.search,
+          border: InputBorder.none,
+          hintStyle: const TextStyle(color: Colors.white60),
+        ),
+        style: const TextStyle(color: Colors.white),
+        onSubmitted: (query) {
+          if (query.isNotEmpty) {
+            viewModel.searchArticles(query);
+          }
+        });
   }
 
-  // AppBar Actions method
-  List<Widget> buildAppBarActions() {
-    if (isSearching) {
+  List<Widget> buildAppBarActions(HomeViewModel viewModel) {
+    if (viewModel.isSearching) {
       return [
         IconButton(
           icon: const Icon(Icons.clear),
           onPressed: () {
-            setState(() {
-              isSearching = false;
-              searchController.clear();
-              searchQuery = '';
-              searchResults = null; // Clear search results
-            });
+            searchController.clear();
+            viewModel.clearSearch();
+            viewModel.stopSearch();
           },
-        )
+        ),
       ];
     } else {
       return [
         IconButton(
           icon: const Icon(Icons.search),
           onPressed: () {
-            setState(() {
-              isSearching = true;
-            });
+            viewModel.startSearch(); // Start search mode
           },
         ),
       ];
     }
   }
 
-  Widget buildSearchResults() {
-    if (searchResults == null) {
-      return Center(
-        child: Text(
-            AppLocalizations.of(context)!.search), // Localized search prompt
-      );
-    }
-
-    if (searchResults!.isEmpty) {
-      return const Center(
-        child: Text("No Article Found"),
-      );
+  Widget buildArticleWidget(List<Articles> articles) {
+    if (articles.isEmpty) {
+      return const Center(child: Text('No Data'));
     }
 
     return ListView.builder(
-      itemCount: searchResults?.length ?? 0,
+      itemCount: articles.length, // Use the length of the provided article list
       itemBuilder: (context, index) {
-        Articles article = searchResults![index];
-        return ArticleCardWidget(article: article);
+        final article = articles[index];
+
+        return InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DetailsScreen(article: article),
+              ),
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Card(
+              elevation: 3,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Handling null for article.urlToImage
+                  if (article.urlToImage != null)
+                    ClipRRect(
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(15),
+                        topRight: Radius.circular(15),
+                      ),
+                      child: Image.network(
+                        article.urlToImage!,
+                        height: 200,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                  else
+                    const SizedBox(
+                      height: 200,
+                      child: Center(
+                        child: Icon(
+                          Icons.broken_image,
+                          size: 50,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Handling null for article.title
+                        Text(
+                          article.title ?? "No Title",
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          article.description ?? "No Description",
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            // Handling null for article.publishedAt
+                            Text(
+                              article.publishedAt?.substring(0, 10) ??
+                                  "Unknown Date",
+                              style: const TextStyle(
+                                  fontSize: 12, color: Colors.grey),
+                            ),
+                            const Icon(Icons.more_vert),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
       },
     );
   }
 
-  // Category Tap method
-  void onCategoryTap(CategoryData selectedCategoryData) {
-    setState(() {
-      categoryData = selectedCategoryData;
-      searchResults = null;
-    });
+  @override
+  void showLoading() {
+    showDialog(
+      context: context,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
   }
 
-  // Drawer Pop method
-  void popDrawer() {
-    setState(() {
-      categoryData = null;
-      Navigator.pop(context);
-    });
-  }
-
-  void searchArticles(String query) async {
-    if (query.isNotEmpty) {
-      setState(() {
-        isSearching = true;
-      });
-
-      ArticleModel? articleModelResponse = await ApiManager.getArticles(query);
-
-      setState(() {
-        isSearching = false;
-        searchResults =
-            filterValidArticles(articleModelResponse?.articles ?? []);
-      });
-    }
-  }
-
-  List<Articles> filterValidArticles(List<Articles> articles) {
-    return articles.where((article) {
-      return article.title != null &&
-          article.description != null &&
-          article.publishedAt != null;
-    }).toList();
+  @override
+  void hideLoading() {
+    Navigator.pop(context);
   }
 }

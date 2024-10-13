@@ -1,62 +1,70 @@
 class ArticleModel {
-  String? status;
-  int? totalResults;
-  List<Articles>? articles;
+  final String? status;
+  final int? totalResults;
+  final List<Articles> articles;
 
-  ArticleModel({this.status, this.totalResults, this.articles});
+  ArticleModel(
+      {required this.status,
+      required this.totalResults,
+      required this.articles});
 
-  ArticleModel.fromJson(Map<String, dynamic> json) {
-    status = json['status'];
-    totalResults = json['totalResults'];
-    if (json['articles'] != null) {
-      articles = [];
-      json['articles'].forEach((v) {
-        articles!.add(Articles.fromJson(v));
-      });
-    }
+  factory ArticleModel.fromJson(Map<String, dynamic> json) {
+    var list = json['articles'] as List;
+    List<Articles> articlesList =
+        list.map((i) => Articles.fromJson(i)).toList();
+    return ArticleModel(
+      status: json['status'],
+      totalResults: json['totalResults'],
+      articles: articlesList,
+    );
   }
 }
 
 class Articles {
-  Source? source;
-  String? author;
-  String? title;
-  String? description;
-  String? url;
-  String? urlToImage;
-  String? publishedAt;
-  String? content;
+  final Source? source;
+  final String? author;
+  final String? title;
+  final String? description;
+  final String? url;
+  final String? urlToImage;
+  final String? publishedAt;
+  final String? content;
 
-  Articles(
-      {this.source,
-      this.author,
-      this.title,
-      this.description,
-      this.url,
-      this.urlToImage,
-      this.publishedAt,
-      this.content});
+  Articles({
+    required this.source,
+    this.author,
+    required this.title,
+    required this.description,
+    required this.url,
+    required this.urlToImage,
+    required this.publishedAt,
+    required this.content,
+  });
 
-  Articles.fromJson(Map<String, dynamic> json) {
-    source = json['source'] != null ? Source.fromJson(json['source']) : null;
-    author = json['author'];
-    title = json['title'];
-    description = json['description'];
-    url = json['url'];
-    urlToImage = json['urlToImage'];
-    publishedAt = json['publishedAt'];
-    content = json['content'];
+  factory Articles.fromJson(Map<String, dynamic> json) {
+    return Articles(
+      source: Source.fromJson(json['source']),
+      author: json['author'],
+      title: json['title'] as String?,
+      description: json['description'] as String?,
+      url: json['url'],
+      urlToImage: json['urlToImage'],
+      publishedAt: json['publishedAt'],
+      content: json['content'],
+    );
   }
 }
 
 class Source {
-  String? id;
-  String? name;
+  final String? id;
+  final String? name;
 
-  Source({this.id, this.name});
+  Source({this.id, required this.name});
 
-  Source.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    name = json['name'];
+  factory Source.fromJson(Map<String, dynamic> json) {
+    return Source(
+      id: json['id'],
+      name: json['name'],
+    );
   }
 }

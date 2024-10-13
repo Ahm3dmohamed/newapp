@@ -10,72 +10,82 @@ class EndPoints {
 
 class ApiManager {
   static const String baseUrl = "newsapi.org";
-  static const String apiKey = "f766fc89b5694cc68b5b5c79c7744b50";
+  static const String apiKey = "37f479c1939d4bb395211dc9f4091b02";
 
-  static Future<SoursesResponceModel?> getSources(
-    String sourceName,
-  ) async {
-    try {
-      var params = {
-        "apiKey": apiKey,
-        'category': sourceName,
-      };
-      Uri url = Uri.https(baseUrl, EndPoints.sources, params);
+  // static Future<SoursesResponceModel?> getSources(String categoryId) async {
+  //   var params = {
+  //     "apiKey": apiKey,
+  //     "category": categoryId,
+  //   };
+  //   Uri url = Uri.https(baseUrl, EndPoints.sources, params);
 
-      http.Response response = await http.get(url);
-      if (response.statusCode == 429) {
-        print('Too many requests - please try again later');
-      }
-      if (response.statusCode == 200) {
-        var json = jsonDecode(response.body);
-        SoursesResponceModel sourcesResponse =
-            SoursesResponceModel.fromJson(json);
-        return sourcesResponse;
-      } else {
-        print('Failed to load sources: ${response.statusCode}');
-        return null;
-      }
-    } catch (e) {
-      print('Error: $e');
+  //   http.Response response = await http.get(url);
+  //   if (response.statusCode >= 200) {
+  //     var json = jsonDecode(response.body);
+  //     return SoursesResponceModel.fromJson(json);
+  //   } else {
+  //     throw Exception("Failed to load sources");
+  //   }
+  // }
+
+  // static Future<ArticleModel?> getArticles(String sourceId) async {
+  //   var params = {
+  //     "apiKey": apiKey,
+  //     "sources": sourceId,
+  //   };
+  //   Uri url = Uri.https(baseUrl, "/v2/top-headlines", params);
+
+  //   http.Response response = await http.get(url);
+  //   if (response.statusCode >= 200) {
+  //     var json = jsonDecode(response.body);
+  //     return ArticleModel.fromJson(json);
+  //   } else {
+  //     throw Exception("Failed to load articles");
+  //   }
+
+  static Future<SoursesResponceModel?> getSources(String categoryId) async {
+    var params = {
+      "apiKey": apiKey,
+      "category": categoryId,
+    };
+    Uri url = Uri.https(baseUrl, EndPoints.sources, params);
+
+    http.Response response = await http.get(url);
+    if (response.statusCode == 200) {
+      return SoursesResponceModel.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception("Failed to load sources");
+    }
+  }
+
+  static Future<ArticleModel?> getArticles(String sourceId) async {
+    var params = {
+      "apiKey": apiKey,
+      "sources": sourceId, // Use the correct source ID to fetch articles
+    };
+    Uri url = Uri.https(baseUrl, "/v2/top-headlines", params);
+
+    http.Response response = await http.get(url);
+    if (response.statusCode == 200) {
+      return ArticleModel.fromJson(jsonDecode(response.body));
+    } else {
+      print('Failed to load articles. Status code: ${response.statusCode}');
       return null;
     }
   }
 
-  static Future<ArticleModel?> getArticles(
-    String id,
-  ) async {
-    var params = {
-      "apiKey": apiKey,
-      "q": id,
-    };
-    Uri url = Uri.https(baseUrl, EndPoints.articleUrl, params);
-
-    http.Response response = await http.get(url);
-    if (response.statusCode == 200) {
-      var json = jsonDecode(response.body);
-      ArticleModel articleResponse = ArticleModel.fromJson(json);
-      return articleResponse;
-    } else {
-      throw Exception("Failed to load articles");
-    }
-  }
-
-  static Future<ArticleModel?> searchArticlesData(
-    String query,
-  ) async {
+  static Future<ArticleModel?> searchArticles(String query) async {
     var params = {
       "apiKey": apiKey,
       "q": query,
     };
-    Uri url = Uri.https(baseUrl, EndPoints.articleUrl, params);
+    Uri url = Uri.https(baseUrl, "/v2/everything", params);
 
     http.Response response = await http.get(url);
     if (response.statusCode == 200) {
-      var json = jsonDecode(response.body);
-      ArticleModel articleResponse = ArticleModel.fromJson(json);
-      return articleResponse;
+      return ArticleModel.fromJson(jsonDecode(response.body));
     } else {
-      throw Exception("Failed to load articles");
+      throw Exception("Failed to search articles");
     }
   }
 }

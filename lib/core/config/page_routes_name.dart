@@ -1,5 +1,5 @@
-class PageRoutesName {
-  static const String homeScreen = '/';
-  static const String newsScreen = '/news';
-  static const String setting = '/settings';
-}
+// class PageRoutesName {
+//   static const String homeScreen = '/';
+//   static const String newsScreen = '/news';
+//   static const String setting = '/settings';
+// }

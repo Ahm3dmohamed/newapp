@@ -3,7 +3,6 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // Adjust if needed
 import 'package:news_app/core/theme/apptheme.dart';
 import 'package:news_app/modules/screens/home.dart';
-import 'package:news_app/modules/screens/news_screen.dart';
 import 'package:news_app/modules/screens/settings.dart';
 import 'package:news_app/providers/local_provider.dart';
 import 'package:provider/provider.dart';
@@ -19,7 +18,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localeProvider = Provider.of<LocaleProvider>(context);
-
     return MaterialApp(
       theme: Apptheme.lightThem,
       themeMode: ThemeMode.system,
@@ -40,7 +38,7 @@ class MyApp extends StatelessWidget {
       initialRoute: HomeScreen.routeName,
       routes: {
         HomeScreen.routeName: (_) => const HomeScreen(),
-        NewsScreen.routeName: (_) => NewsScreen(),
+        // NewsScreen.routeName: (_) => NewsScreen(),
         Settings.routeName: (_) => const Settings(),
       },
     );

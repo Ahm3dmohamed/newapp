@@ -3,11 +3,15 @@ import 'package:news_app/models/article_responce_model.dart';
 import 'package:news_app/modules/screens/details_screen.dart';
 
 class ArticleCardWidget extends StatelessWidget {
-  final Articles article; // Add this to accept an article object
+  final Articles article;
+  final String? title;
+  final String? description;
 
   const ArticleCardWidget({
     super.key,
-    required this.article, // Ensure article is required
+    required this.article,
+    required this.title,
+    required this.description,
   });
 
   @override
@@ -31,6 +35,7 @@ class ArticleCardWidget extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Handling null for article.urlToImage
               if (article.urlToImage != null)
                 ClipRRect(
                   borderRadius: const BorderRadius.only(
@@ -43,12 +48,24 @@ class ArticleCardWidget extends StatelessWidget {
                     width: double.infinity,
                     fit: BoxFit.cover,
                   ),
+                )
+              else
+                const SizedBox(
+                  height: 200,
+                  child: Center(
+                    child: Icon(
+                      Icons.broken_image,
+                      size: 50,
+                      color: Colors.grey,
+                    ),
+                  ),
                 ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Handling null for article.title
                     Text(
                       article.title ?? "No Title",
                       style: const TextStyle(
@@ -60,6 +77,7 @@ class ArticleCardWidget extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
+                        // Handling null for article.publishedAt
                         Text(
                           article.publishedAt?.substring(0, 10) ??
                               "Unknown Date",

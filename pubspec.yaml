@@ -33,7 +33,15 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   generate: true
-  
+  assets:
+    - assets/images/
+    - assets/images/health.png
+    - assets/images/sports.png
+    - assets/images/science.png
+    - assets/images/bussines.png
+    - assets/images/politics.png
+    - assets/images/entertainment.png  
+
 flutter_intl:
   enabled: true
   arb-dir: lib/l10n
@@ -47,9 +55,6 @@ flutter_intl:
     - ar
     - fr
   use-deferred-loading: false
-  # To add assets to your application, add an assets section, like this:
-  assets:
-     - assets/images/
 
 
   
