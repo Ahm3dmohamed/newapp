@@ -18,7 +18,9 @@ class DetailsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          article.title ?? localizations?.no_Title ?? "Article Details",
+          article.title!.substring(0, 20) ??
+              localizations?.no_Title ??
+              "Article Details",
           style: const TextStyle(fontSize: 16),
           maxLines: 2,
         ),
@@ -50,8 +52,8 @@ class DetailsScreen extends StatelessWidget {
             Text(
               article.title ?? localizations?.no_Title ?? "No Title",
               style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
+                fontSize: 20,
+                fontWeight: FontWeight.w800,
               ),
             ),
             SizedBox(height: size.height * .01),
@@ -74,7 +76,7 @@ class DetailsScreen extends StatelessWidget {
               article.content ??
                   localizations?.no_Description ??
                   "No Content Available",
-              style: const TextStyle(fontSize: 18),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
             ),
             SizedBox(height: size.height * .05),
             Row(

@@ -115,12 +115,17 @@ class HomeViewModel extends ChangeNotifier {
       notifyListeners();
 
       try {
+        // Assuming ApiManager.getArticles(query) returns an ArticleModel or null
         ArticleModel? articleModelResponse =
-            await ApiManager.searchArticles(query);
+            await ApiManager.getArticles(query);
 
         if (articleModelResponse != null &&
             articleModelResponse.articles != null) {
-          searchResults = articleModelResponse.articles!;
+          searchResults = articleModelResponse.articles!
+              .where((article) =>
+                  article.title != null &&
+                  article.description != null) // Filter out null fields
+              .toList();
           print('Search results fetched: ${searchResults.length}');
         } else {
           searchResults = [];
