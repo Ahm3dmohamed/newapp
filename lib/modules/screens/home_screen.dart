@@ -1,25 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:news_app/core/drawer/custom_drawer.dart';
+import 'package:news_app/cubit/cubit.dart';
+import 'package:news_app/cubit/state.dart';
 import 'package:news_app/models/category_screen.dart';
-import 'package:news_app/modules/home/manager/home_connector.dart';
-import 'package:news_app/modules/home/manager/home_view_model.dart';
 import 'package:news_app/modules/layouts/custom_Bg_widget.dart';
 import 'package:news_app/modules/screens/search/widget/build_article_widget.dart';
 import 'package:news_app/modules/screens/search/widget/custom_searchfield.dart';
 import 'package:news_app/modules/widgets/tab_item.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class HomeScreen extends StatefulWidget {
   static const String routeName = "HomeScreen";
 
-  const HomeScreen({super.key});
-
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> implements HomeConnector {
+class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController searchController = TextEditingController();
 
   @override
@@ -27,26 +25,42 @@ class _HomeScreenState extends State<HomeScreen> implements HomeConnector {
     Size size = MediaQuery.of(context).size;
 
     return CustomBgWidget(
-      child: ChangeNotifierProvider(
-        create: (_) => HomeViewModel()..connector = this,
-        child: Consumer<HomeViewModel>(
-          builder: (context, viewModel, child) {
+      child: BlocProvider(
+        create: (_) => HomeCubit(),
+        child: BlocConsumer<HomeCubit, HomeState>(
+          listener: (context, state) {
+            if (state is GetSourcesLoadingState ||
+                state is GetArticlesLoadingState) {
+              showLoadingDialog(context);
+            } else if (state is GetSourcesErrorState) {
+              dismissDialog(context);
+              showErrorDialog(context, state.error);
+            } else if (state is GetSourcesSuccessState) {
+              dismissDialog(context);
+            }
+          },
+          builder: (context, state) {
+            var cubit = HomeCubit.get(context);
             return Scaffold(
               backgroundColor: Colors.transparent,
-              drawer: CustomDrawer(viewModel: viewModel),
+              drawer: CustomDrawer(cubit: cubit),
               appBar: AppBar(
-                title: viewModel.isSearching
-                    ? BuildSearchField(
+                title: cubit.isSearching
+                    ? CustomSearchField(
                         searchController: searchController,
-                        context: context,
-                        viewModel: viewModel)
-                    : Text(viewModel.categoryData?.name ??
-                        AppLocalizations.of(context)!.title),
-                actions: buildAppBarActions(viewModel),
+                        onSearch: (String query) {
+                          cubit.searchArticles(query);
+                        },
+                      )
+                    : Text(
+                        cubit.categoryData?.name ??
+                            AppLocalizations.of(context)!.title,
+                      ),
+                actions: buildAppBarActions(cubit),
               ),
-              body: viewModel.isSearching
-                  ? BuildArticleWidget(articles: viewModel.searchResults)
-                  : _buildMainContent(viewModel, size),
+              body: cubit.isSearching
+                  ? BuildArticleWidget(articles: cubit.searchResults)
+                  : _buildMainContent(cubit, size),
             );
           },
         ),
@@ -54,21 +68,24 @@ class _HomeScreenState extends State<HomeScreen> implements HomeConnector {
     );
   }
 
-  Widget _buildMainContent(HomeViewModel viewModel, Size size) {
-    if (viewModel.categoryData == null) {
+  void dismissDialog(BuildContext context) {
+    if (Navigator.canPop(context)) Navigator.pop(context);
+  }
+
+  Widget _buildMainContent(HomeCubit cubit, Size size) {
+    if (cubit.categoryData == null) {
       return CategoryScreen(
         size: size,
-        onCategoryClick: viewModel.onCategoryTap,
-        categoryDataList: viewModel.categoryDataList,
+        onCategoryClick: cubit.onTabSelected, // Directly pass the callback
+        categoryDataList: cubit.categoryDataList,
       );
     } else {
       return Column(
         children: [
-          _buildSourceTabs(viewModel, size), // Source tabs at the top
+          _buildSourceTabs(cubit, size),
           Expanded(
-            // This ensures the article list takes the remaining space
             child: BuildArticleWidget(
-              articles: viewModel.filteredArticles,
+              articles: cubit.filteredArticles,
             ),
           ),
         ],
@@ -76,32 +93,24 @@ class _HomeScreenState extends State<HomeScreen> implements HomeConnector {
     }
   }
 
-  Widget _buildSourceTabs(HomeViewModel viewModel, Size size) {
+  Widget _buildSourceTabs(HomeCubit cubit, Size size) {
     return SizedBox(
-      height: size.height * .09, // Adjust height for the tabs
+      height: size.height * .09,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        itemCount: viewModel.sources.length,
+        itemCount: cubit.sources.length,
         itemBuilder: (context, index) {
-          final source = viewModel.sources[index];
+          final source = cubit.sources[index];
           return GestureDetector(
             onTap: () {
-              viewModel.onTabSelected(index);
+              if (cubit.state is! GetArticlesLoadingState &&
+                  source.id != null) {
+                cubit.getArticles(); // Fetch articles when a source is tapped
+              }
             },
-            child: DefaultTabController(
-              length: viewModel.sources.length,
-              child: TabBar(
-                indicatorColor: Colors.transparent,
-                isScrollable: true,
-                onTap: viewModel.onTabSelected,
-                tabs: viewModel.sources
-                    .map((source) => TabItem(
-                          source: source,
-                          isSelected: viewModel.selectedTab ==
-                              viewModel.sources.indexOf(source),
-                        ))
-                    .toList(),
-              ),
+            child: TabItem(
+              source: source,
+              isSelected: cubit.selectedTab == index,
             ),
           );
         },
@@ -109,15 +118,14 @@ class _HomeScreenState extends State<HomeScreen> implements HomeConnector {
     );
   }
 
-  List<Widget> buildAppBarActions(HomeViewModel viewModel) {
-    if (viewModel.isSearching) {
+  List<Widget> buildAppBarActions(HomeCubit cubit) {
+    if (cubit.isSearching) {
       return [
         IconButton(
           icon: const Icon(Icons.clear),
           onPressed: () {
             searchController.clear();
-            viewModel.clearSearch();
-            viewModel.stopSearch();
+            cubit.clearSearch();
           },
         ),
       ];
@@ -125,24 +133,34 @@ class _HomeScreenState extends State<HomeScreen> implements HomeConnector {
       return [
         IconButton(
           icon: const Icon(Icons.search),
-          onPressed: () {
-            viewModel.startSearch(); // Start search mode
-          },
+          onPressed: cubit.toggleSearchMode,
         ),
       ];
     }
   }
 
-  @override
-  void showLoading() {
+  void showLoadingDialog(BuildContext context) {
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (_) => const Center(child: CircularProgressIndicator()),
     );
   }
 
-  @override
-  void hideLoading() {
+  void showErrorDialog(BuildContext context, String error) {
     Navigator.pop(context);
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Error"),
+        content: Text(error),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("OK"),
+          ),
+        ],
+      ),
+    );
   }
 }

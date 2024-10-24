@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:news_app/models/article_responce_model.dart';
-import 'package:news_app/models/sourses_responce_model.dart';
+import 'package:news_app/models/source_model.dart';
 
 class EndPoints {
   static const String sources = "/v2/top-headlines/sources";
@@ -10,7 +10,8 @@ class EndPoints {
 
 class ApiManager {
   static const String baseUrl = "newsapi.org";
-  static const String apiKey = "37f479c1939d4bb395211dc9f4091b02";
+  // static const String apiKey = "37f479c1939d4bb395211dc9f4091b02";
+  static const String apiKey = "8fe2308f3f284a9e90a73d0915701c8f";
 
   // static Future<SoursesResponceModel?> getSources(String categoryId) async {
   //   var params = {
@@ -43,7 +44,7 @@ class ApiManager {
   //     throw Exception("Failed to load articles");
   //   }
 
-  static Future<SoursesResponceModel?> getSources(String categoryId) async {
+  static Future<SourcesModel?> getSources(String categoryId) async {
     var params = {
       "apiKey": apiKey,
       "category": categoryId,
@@ -52,7 +53,7 @@ class ApiManager {
 
     http.Response response = await http.get(url);
     if (response.statusCode == 200) {
-      return SoursesResponceModel.fromJson(jsonDecode(response.body));
+      return SourcesModel.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("Failed to load sources");
     }

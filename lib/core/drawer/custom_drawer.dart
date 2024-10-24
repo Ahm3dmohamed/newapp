@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:news_app/core/drawer/custom_list_tiledart';
-import 'package:news_app/modules/home/manager/home_view_model.dart';
+import 'package:news_app/cubit/cubit.dart';
 import 'package:news_app/modules/screens/settings.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // Adjust if needed
 
 class CustomDrawer extends StatelessWidget {
-  final HomeViewModel viewModel;
+  final HomeCubit cubit;
 
-  const CustomDrawer({required this.viewModel});
+  const CustomDrawer({required this.cubit});
 
   @override
   Widget build(BuildContext context) {
@@ -22,8 +22,8 @@ class CustomDrawer extends StatelessWidget {
           children: [
             CustomListTile(
               onTap: () {
-                viewModel.clearSearch();
-                viewModel.categoryData = null;
+                cubit.clearSearch();
+                cubit.categoryData = null;
                 Navigator.pop(context);
               },
               icon: Icons.list_rounded,

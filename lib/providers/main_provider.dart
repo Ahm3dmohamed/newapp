@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:news_app/models/article_responce_model.dart';
-import 'package:news_app/models/sourses_responce_model.dart';
+import 'package:news_app/models/source_model.dart';
 
 class MainProvider extends ChangeNotifier {
   // int currentIndex = 0;

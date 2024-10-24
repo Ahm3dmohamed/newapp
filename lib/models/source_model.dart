@@ -1,11 +1,13 @@
-class SoursesResponceModel {
+class SourcesModel {
   String? status;
+  String? message;
   List<Sources>? sources;
 
-  SoursesResponceModel({this.status, this.sources});
+  SourcesModel({this.status, this.sources});
 
-  SoursesResponceModel.fromJson(Map<String, dynamic> json) {
+  SourcesModel.fromJson(Map<String, dynamic> json) {
     status = json['status'];
+    // message = json['message'];
     if (json['sources'] != null) {
       sources = <Sources>[];
       json['sources'].forEach((v) {
@@ -18,6 +20,7 @@ class SoursesResponceModel {
 class Sources {
   String? id;
   String? name;
+  String? message;
   String? description;
   String? url;
   String? category;
@@ -27,6 +30,7 @@ class Sources {
   Sources(
       {this.id,
       this.name,
+      this.message,
       this.description,
       this.url,
       this.category,
@@ -36,6 +40,7 @@ class Sources {
   Sources.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
+    message = json['message'];
     description = json['description'];
     url = json['url'];
     category = json['category'];

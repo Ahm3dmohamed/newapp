@@ -31,21 +31,20 @@ class CategoryScreen extends StatelessWidget {
         ),
         Expanded(
           child: GridView.builder(
-            // padding: const EdgeInsets.all(0.0),
             itemCount: categoryDataList.length,
             itemBuilder: (context, index) {
               return CategoryItemsWidget(
                 categoryData: categoryDataList[index],
                 index: index,
                 onTap: (categoryData) {
-                  onCategoryClick(categoryData);
+                  onCategoryClick(categoryData); // Pass CategoryData object
                 },
               );
             },
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
               crossAxisSpacing: 5.0,
-              mainAxisSpacing: .2,
+              mainAxisSpacing: 0.2,
               childAspectRatio: 0.8,
             ),
           ),
